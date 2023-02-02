@@ -4,6 +4,9 @@ import Syntax;
 import AST;
 
 import ParseTree;
+import String;
+import Boolean;
+
 
 /*
  * Implement a mapping from concrete syntax trees (CSTs) to abstract syntax trees (ASTs)
@@ -15,68 +18,57 @@ import ParseTree;
  * - See the ref example on how to obtain and propagate source locations.
  */
 
-AForm cst2ast(start[Form] sf) {
+AForm cst2ast(start[Form] sf) 
+{
   Form f = sf.top; // remove layout before and after form
-  return form("", [ ], src=f.src); 
+  return form("<f.name>", [cst2ast(q) | Question q <- f.questions], src=f@\loc); 
 }
 
-AForm cst2ast(form:(Form)`form <Id m> { <Question* qs> }`) 
-  = form("<m>", [cst2ast(q) | Question q <- qs], src = form@\loc);
-
-AQuestion cst2ast(quest:(Question)`<NormalQuestion nq>`) 
-  = nquestion(cst2ast(nq), src = quest@\loc);
-
-AQuestion cst2ast(quest:(Question)`<ComputedQuestion cq>`)
-  = cquestion(cst2ast(cq), src = quest@\loc);
-
-AQuestion cst2ast(quest:(Question)`<Block block>`)
-  = block(cst2ast(block), src = quest@\loc);
-
-AQuestion cst2ast(quest:(Question)`if ( <Expr e> ) <Block block>`)
-  = questionif(cst2ast(e), cst2ast(block), src = quest@\loc);
-
-ANormalQuestion cst2ast(nquest:(NormalQuestion)`<Str s> <Id m> : <Type typ>`)
-  = normalquestion("<s>", "<m>", cst2ast(typ), src = nquest@\loc);
-
-AComputedQuestion cst2ast(cquest:(ComputedQuestion)`<Str s> <Id m> : <Type typ> = <Expr e>`)
-  = computedquestion("<s>", "<m>", cst2ast(typ), cst2ast(e), src = cquest@\loc);
-
-ABlock cst2ast(blck:(Block)`{ <Question* qs> }`)
-  = block([cst2ast(q) | Question q <- qs], src = blck@\loc);
+AQuestion cst2ast(Question q) {
+  switch (q) {
+    case (Question)`<Str question> <Id name> : <Type tp>`: return normalquestion(cst2ast((Expr)`<Str question>`), cst2ast((Expr)`<Id name>`), cst2ast(tp), src=q@\loc);
+    case (Question)`<Str question> <Id name> : <Type tp> = <Expr exp>`: return computedquestion(cst2ast((Expr)`<Str question>`), cst2ast((Expr)`<Id name>`), cst2ast(tp), cst2ast(exp), src=q@\loc);
+    case (Question)`{ <Question* questions> }`: return block([cst2ast(q) | Question q <- questions], src=q@\loc);
+    case (Question)`if (<Expr cond>) { <Question* tquestions> } else { <Question* fquestions> }`: return question_ifelse(cst2ast(cond), [cst2ast(q) | Question q <- tquestions], [cst2ast(q) | Question q <- fquestions], src=q@\loc);
+    case (Question)`if (<Expr cond>) { <Question* questions> }`: return question_if(cst2ast(cond), [cst2ast(q) | Question q <- questions], src=q@\loc);
+    
+    default:
+      throw "Not yet implemented <q>";
+  }
+}
 
 AExpr cst2ast(Expr e) {
   switch (e) {
-    case (Expr)`<Id x>`: return ref(id("<x>", src=x.src), src=x.src);
-    case (ex:(Expr)`<Str s>`): return string("<s>", src = ex@\loc);
-    case (ex:(Expr)`<Int i>`): return number("<i>", src = ex@\loc);
-    case (ex:(Expr)`<Bool boo>`): return boolean("<boo>", src = ex@\loc);
-    case (Expr)`( <Expr e> )`: return cst2ast(e);
-    case (ex:(Expr)`!<Expr e>`): return not(cst2ast(e), src = ex@\loc);
-    case (ex:(Expr)`<Expr lhs> + <Expr rhs>`): return add(cst2ast(lhs), cst2ast(rhs), src = ex@\loc);
-    case (ex:(Expr)`<Expr lhs> - <Expr rhs>`): return sub(cst2ast(lhs), cst2ast(rhs), src = ex@\loc);
-    case (ex:(Expr)`<Expr lhs> * <Expr rhs>`): return mul(cst2ast(lhs), cst2ast(rhs), src = ex@\loc);
-    case (ex:(Expr)`<Expr lhs> / <Expr rhs>`): return div(cst2ast(lhs), cst2ast(rhs), src = ex@\loc);
-    case (ex:(Expr)`<Expr lhs> \> <Expr rhs>`): return gr(cst2ast(lhs), cst2ast(rhs), src = ex@\loc);
-    case (ex:(Expr)`<Expr lhs> \< <Expr rhs>`): return ls(cst2ast(lhs), cst2ast(rhs), src = ex@\loc);
-    case (ex:(Expr)`<Expr lhs> \<= <Expr rhs>`): return leq(cst2ast(lhs), cst2ast(rhs), src = ex@\loc);
-    case (ex:(Expr)`<Expr lhs> \>= <Expr rhs>`): return geq(cst2ast(lhs), cst2ast(rhs), src = ex@\loc);
-    case (ex:(Expr)`<Expr lhs> == <Expr rhs>`): return eq(cst2ast(lhs), cst2ast(rhs), src = ex@\loc);
-    case (ex:(Expr)`<Expr lhs> != <Expr rhs>`): return neq(cst2ast(lhs), cst2ast(rhs), src = ex@\loc);
-    case (ex:(Expr)`<Expr lhs> && <Expr rhs>`): return and(cst2ast(lhs), cst2ast(rhs), src = ex@\loc);
-    case (ex:(Expr)`<Expr lhs> ||<Expr rhs>`): return or(cst2ast(lhs), cst2ast(rhs), src = ex@\loc);
+    case (Expr)`<Id x>`: return ref(id("<x>", src=x@\src), src=x@\src);
+    case (Expr)`<Str s>`: return st("<s>", src = s@\loc);
+    case (Expr)`<Int n>`: return number(toInt("<n>"), src = n@\loc);
+    case (Expr)`<Bool b>`: return bln(fromString("<b>"), src = b@\loc);
+    case (Expr)`(<Expr x>)`: return brck(cst2ast(x), src = x@\loc);
+    case (Expr)`!<Expr exp>`: return not(cst2ast(exp), src = exp@\loc);
+    case (Expr)`<Expr l> + <Expr r>`: return add(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Expr l> - <Expr r>`: return sub(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Expr l> * <Expr r>`: return mul(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Expr l> / <Expr r>`: return div(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Expr l> \> <Expr r>`: return gr(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Expr l> \< <Expr r>`: return ls(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Expr l> \<= <Expr r>`: return leq(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Expr l> \>= <Expr r>`: return geq(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Expr l> == <Expr r>`: return eq(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Expr l> != <Expr r>`: return neq(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Expr l> && <Expr r>`: return and(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Expr l> ||<Expr r>`: return or(cst2ast(l), cst2ast(r), src = e@\loc);
     
     default: throw "Unhandled expression: <e>";
   }
 }
 
-AType cst2ast(tp:(Type)`integer`) {
-  typ(src = tp@\loc);
+AType cst2ast(Type tp) {
+  switch (tp) {
+    case (Type)`integer`: return integer(src=tp@\loc);
+    case (Type)`boolean`: return boolean(src=tp@\loc);
+    case (Type)`string`: return string(src=tp@\loc);
+
+    default: throw "Unhandled type: <tp>";
+  }
 }
 
-AType cst2ast(tp:(Type)`boolean`) {
-  typ(src = tp@\loc);
-}
-
-AType cst2ast(tp:(Type)`string`) {
-  typ(src = tp@\loc);
-}

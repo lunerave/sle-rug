@@ -25,10 +25,13 @@ alias RefGraph = tuple[
 RefGraph resolve(AForm f) = <us, ds, us o ds>
   when Use us := uses(f), Def ds := defs(f);
 
+// use from ID in Expr
 Use uses(AForm f) {
-  return { <e.id.src, e.id.name> | /AExpr e := f}; 
+	return {<r.src, id.name> | /r:ref(AId id) := f};
 }
 
+// def from ID in normal question or computed question
 Def defs(AForm f) {
-  return { <nq.name, nq.src> | /ANormalQuestion nq := f} + { <cq.name, cq.src> | /AComputedQuestion cq := f}; 
+	return {<id.name, nq.src> | /nq:normalquestion(AExpr question, ref(AId id), AType tp):=f} 
+		 + {<id.name, cq.src> | /cq:computedquestion(AExpr question, ref(AId id), AType tp, AExpr exp):=f};
 }

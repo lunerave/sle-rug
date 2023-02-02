@@ -15,27 +15,20 @@ data AForm(loc src = |tmp:///|)
   ; 
 
 data AQuestion(loc src = |tmp:///|)
-  = nquestion(ANormalQuestion anq)
-  | cquestion(AComputedQuestion acq)
-  | block(ABlock ablock)
-  | ifelse(AExpr arg, ABlock ablock, ABlock ablock) //어케하지
+  = normalquestion(AExpr question, AExpr name, AType tp) 
+  | computedquestion(AExpr question, AExpr name, AType tp, AExpr exp)
+  | block(list[AQuestion] questions)
+  | question_ifelse(AExpr cond, list[AQuestion] tquestions, list[AQuestion] fquestions)
+  | question_if(AExpr cond, list[AQuestion] questions) 
   ; 
-
-data ANormalQuestion(loc src = |tmp:///|)
-  = normalquestion(str question, str name, AType tp) ;
-
-data AComputedQuestion(loc src = |tmp:///|) 
-  = computedquestion(str question, str name, AType tp, AExpr exp);
-
-data ABlock(loc src = |tmp:///|) 
-  = block(list[AQuestion] questions);
 
 data AExpr(loc src = |tmp:///|)
   = ref(AId id)
-  | string(str string)
-  | number(int number)
-  | boolean(bool boolean)
-  | not(AExpr arg)
+  | st(str s)
+  | number(int n)
+  | bln(bool b)
+  | brck(AExpr exp)
+  | not(AExpr exp)
   | add(AExpr lhs, AExpr rhs)
   | sub(AExpr lhs, AExpr rhs)
   | mul(AExpr lhs, AExpr rhs)
@@ -55,4 +48,7 @@ data AId(loc src = |tmp:///|)
   = id(str name);
 
 data AType(loc src = |tmp:///|)
-  = tp();
+  = integer()
+  | boolean()
+  | string()
+  ;

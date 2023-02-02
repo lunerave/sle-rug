@@ -11,50 +11,39 @@ extend lang::std::Id;
 keyword MyKeywords = "if" | "else" | "true" | "false" | "integer" | "string" | "boolean" ;
 
 start syntax Form 
-  = "form" Id \ MyKeywords name "{" Question* questions "}"; 
+  = "form" Id name "{" Question* questions "}"; 
 
 // TODO: question, computed question, block, if-then-else, if-then
 syntax Question 
-  = NormalQuestion
-  | ComputedQuestion
-  | Block
-  | "if" "(" Expr ")" Block ("else" Block)?
+  = normalquestion: Str question Id name ":" Type tp // Normal Question
+  | computedquestion: Str question Id name ":" Type tp "=" Expr exp // Computed Question
+  | block: "{" Question* questions "}"
+  | question_ifelse: "if" "(" Expr cond ")" "{" Question* tquestions "}" "else" "{" Question* fquestions "}" //true then questions && false then questions
+  | question_if: "if" "(" Expr cond ")" "{" Question* questions "}"
   ;
-
-
-syntax NormalQuestion = Str Id \ MyKeywords ":" Type ;
-
-syntax ComputedQuestion = Str Id \ MyKeywords ":" Type "=" Expr ;
-
-syntax Block = "{" Question* questions "}";
 
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
 // Think about disambiguation using priorities and associativity
 // and use C/Java style precedence rules (look it up on the internet)
 syntax Expr 
-  = Id \ MyKeywords // true/false are reserved keywords.
-  | Str
-  | Int
-  | Bool
-  | bracket "(" Expr ")"
-  > right "!" Expr
-  > left ( mul: Expr l "*" Expr r
-         | div: Expr l "/" Expr r
-         )
-  > left ( add: Expr l "+" Expr r
-         | sub: Expr l "-" Expr r 
-         )
-  > left ( gr: Expr l "\>" Expr r
-         | ls: Expr l "\<" Expr r
-         | leq: Expr l "\<=" Expr r
-         | geq: Expr l "\>=" Expr r
-         )
-  > left ( eq: Expr l "==" Expr r
-         | neq: Expr l "!=" Expr r
-         )
-  > left ( and: Expr l "&&" Expr r
-         | or: Expr l "||" Expr r
-         )
+  = Id \ "true" \ "false"
+  | st: Str s
+  | number: Int n
+  | bln: Bool b
+  | bracket brck: "(" Expr e ")"
+  > right not: "!" Expr exp
+  > left mul: Expr lhs "*" Expr rhs
+  > left div: Expr lhs "/" Expr rhs
+  > left add: Expr lhs "+" Expr rhs
+  > left sub: Expr lhs "-" Expr rhs 
+  > left gr: Expr lhs "\>" Expr rhs
+  > left ls: Expr lhs "\<" Expr rhs
+  > left leq: Expr lhs "\<=" Expr rhs
+  > left geq: Expr lhs "\>=" Expr rhs
+  > left eq: Expr lhs "==" Expr rhs
+  > left neq: Expr lhs "!=" Expr rhs
+  > left and: Expr lhs "&&" Expr rhs
+  > left or: Expr lhs "||" Expr rhs
   ;
   
 syntax Type 
@@ -69,6 +58,7 @@ lexical Int
   = [0-9]+;
 
 lexical Bool = "true" | "false";
+
 
 
 
