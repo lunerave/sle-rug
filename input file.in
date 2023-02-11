@@ -1,0 +1,89 @@
+/* for tax.myql */
+import Syntax;
+import ParseTree;
+start[Form] Form1 = parse(#start[Form], |project://sle-rug/examples/tax.myql|); 
+import AST;
+import CST2AST;
+cst2ast(Form1);
+ast = cst2ast(Form1);
+import Resolve;
+g = resolve(ast);
+import Check;
+tenv = collect(ast);
+check(ast, tenv, g.useDef);
+
+/* for errors.myql */
+import Syntax;
+import ParseTree;
+start[Form] Form1 = parse(#start[Form], |project://sle-rug/examples/errors.myql|); 
+import AST;
+import CST2AST;
+cst2ast(Form1);
+ast = cst2ast(Form1);
+import Resolve;
+g = resolve(ast);
+import Check;
+tenv = collect(ast);
+check(ast, tenv, g.useDef);
+
+/* empty.myql */
+import Syntax;
+import ParseTree;
+start[Form] Form1 = parse(#start[Form], |project://sle-rug/examples/empty.myql|); 
+import AST;
+import CST2AST;
+cst2ast(Form1);
+ast = cst2ast(Form1);
+import Resolve;
+g = resolve(ast);
+import Check;
+tenv = collect(ast);
+check(ast, tenv, g.useDef);
+
+/* for cyclic.myql */
+import Syntax;
+import ParseTree;
+start[Form] Form1 = parse(#start[Form], |project://sle-rug/examples/cyclic.myql|); 
+import AST;
+import CST2AST;
+cst2ast(Form1);
+ast = cst2ast(Form1);
+import Resolve;
+g = resolve(ast);
+import Check;
+tenv = collect(ast);
+check(ast, tenv, g.useDef);
+
+/* binary.myql */
+import Syntax;
+import ParseTree;
+start[Form] Form1 = parse(#start[Form], |project://sle-rug/examples/binary.myql|); 
+import AST;
+import CST2AST;
+cst2ast(Form1);
+ast = cst2ast(Form1);
+import Resolve;
+g = resolve(ast);
+import Check;
+tenv = collect(ast);
+check(ast, tenv, g.useDef);
+
+//for transformation rename
+import Transform;
+rename(Form1, location, "newName", g.useDef)
+
+//for tranformation flatten
+import Syntax;
+import ParseTree;
+pt = parse(#start[Form], |project://sle-rug/examples/binary.myql|);
+import AST;
+import CST2AST;
+cst2ast(pt);
+ast2 = cst2ast(pt);
+import Resolve;
+import Transform;
+flatten(ast2);
+
+import Eval;
+venv = initialEnv(ast);
+eval(ast, Form1, venv);

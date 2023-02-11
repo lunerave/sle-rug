@@ -1,0 +1,41 @@
+form testCompileExample { 
+  "Did you buy a house in 2010?"
+    hasBoughtHouse: boolean
+    
+    // akjsdhakjshdkjsa
+    
+  "Did you enter a loan?"
+    hasMaintLoan: boolean
+    
+  "Did you sell a house in 2010?"
+    hasSoldHouse2010: boolean    
+   
+  if (hasSoldHouse2010) {
+    "What was the selling price?"
+      sellingPrice: integer
+    "Private debts for the sold house:"
+      privateDebt: integer
+    "Value residue:"
+      valueResidue: integer = sellingPrice - privateDebt
+
+    "Boolean CheckPoint"
+      checkBool: boolean   
+  } else {
+    "Did you sell a house in 2011?"
+      hasSoldHouse2011: boolean
+    if (hasSoldHouse2011) {
+      "Congratulations! What was the selling price?"
+        sellingPrice2011: integer
+    }
+
+    "Chicken Price"
+      chickenPrice: integer
+    
+    if (chickenPrice > 500) {
+        "The price of chicken is more than $500. Do you think it is expensive?"
+          chickenSurvey: string
+        "HELLO in chicken world"
+          chickenHello: integer = chickenPrice
+    }
+  }
+}

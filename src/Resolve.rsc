@@ -1,3 +1,4 @@
+/* Sangrok Lee (s3279480), Siheon Lee (s2898373)  */
 module Resolve
 
 import AST;
@@ -27,11 +28,11 @@ RefGraph resolve(AForm f) = <us, ds, us o ds>
 
 // use from ID in Expr
 Use uses(AForm f) {
-	return {<r.src, id.name> | /r:ref(AId id) := f};
+	return {<r.src, id.name> | /r:ref(AId id, src = loc u) := f};
 }
 
 // def from ID in normal question or computed question
 Def defs(AForm f) {
-	return {<id.name, nq.src> | /nq:normalquestion(AExpr question, ref(AId id), AType tp):=f} 
-		 + {<id.name, cq.src> | /cq:computedquestion(AExpr question, ref(AId id), AType tp, AExpr exp):=f};
+	return {<id.name, nq.src> | /nq:normalquestion(AExpr question, ref(AId id, src = loc u), AType tp):=f} 
+		 + {<id.name, cq.src> | /cq:computedquestion(AExpr question, ref(AId id, src = loc u), AType tp, AExpr exp):=f};
 }

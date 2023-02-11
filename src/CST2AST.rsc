@@ -1,3 +1,4 @@
+/* Sangrok Lee (s3279480), Siheon Lee (s2898373)  */
 module CST2AST
 
 import Syntax;
@@ -40,23 +41,23 @@ AQuestion cst2ast(Question q) {
 AExpr cst2ast(Expr e) {
   switch (e) {
     case (Expr)`<Id x>`: return ref(id("<x>", src=x@\src), src=x@\src);
-    case (Expr)`<Str s>`: return st("<s>", src = s@\loc);
-    case (Expr)`<Int n>`: return number(toInt("<n>"), src = n@\loc);
-    case (Expr)`<Bool b>`: return bln(fromString("<b>"), src = b@\loc);
-    case (Expr)`(<Expr x>)`: return brck(cst2ast(x), src = x@\loc);
+    case (Expr)`(<Expr x>)`: return cst2ast(x);
+    case (Expr)`<Expr l> * <Expr r>`: return mul(cst2ast(l), cst2ast(r), src = e@\loc);
     case (Expr)`!<Expr exp>`: return not(cst2ast(exp), src = exp@\loc);
     case (Expr)`<Expr l> + <Expr r>`: return add(cst2ast(l), cst2ast(r), src = e@\loc);
     case (Expr)`<Expr l> - <Expr r>`: return sub(cst2ast(l), cst2ast(r), src = e@\loc);
-    case (Expr)`<Expr l> * <Expr r>`: return mul(cst2ast(l), cst2ast(r), src = e@\loc);
     case (Expr)`<Expr l> / <Expr r>`: return div(cst2ast(l), cst2ast(r), src = e@\loc);
     case (Expr)`<Expr l> \> <Expr r>`: return gr(cst2ast(l), cst2ast(r), src = e@\loc);
     case (Expr)`<Expr l> \< <Expr r>`: return ls(cst2ast(l), cst2ast(r), src = e@\loc);
     case (Expr)`<Expr l> \<= <Expr r>`: return leq(cst2ast(l), cst2ast(r), src = e@\loc);
     case (Expr)`<Expr l> \>= <Expr r>`: return geq(cst2ast(l), cst2ast(r), src = e@\loc);
-    case (Expr)`<Expr l> == <Expr r>`: return eq(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Expr l> == <Expr r>`: return equ(cst2ast(l), cst2ast(r), src=e@\loc);
     case (Expr)`<Expr l> != <Expr r>`: return neq(cst2ast(l), cst2ast(r), src = e@\loc);
     case (Expr)`<Expr l> && <Expr r>`: return and(cst2ast(l), cst2ast(r), src = e@\loc);
-    case (Expr)`<Expr l> ||<Expr r>`: return or(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Expr l> || <Expr r>`: return or(cst2ast(l), cst2ast(r), src = e@\loc);
+    case (Expr)`<Bool b>`: return bln(fromString("<b>"), src = b@\loc);
+    case (Expr)`<Int n>`: return number(toInt("<n>"), src = n@\loc);
+    case (Expr)`<Str s>`: return st("<s>", src = s@\loc);
     
     default: throw "Unhandled expression: <e>";
   }

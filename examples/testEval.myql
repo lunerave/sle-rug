@@ -1,0 +1,56 @@
+form testsEval {
+	// Test for updating venv with Input
+	"Normal Question - int"
+	resultInt1: integer
+
+	"Normal Question - boolean"
+	resultBool1: boolean
+
+	"Normal Question - string"
+	resultStr1: string
+
+	// Test for updating venv with computed result
+	"Computed Question - int"
+	resultInt2: integer = 100
+
+	"Computed Question - boolean"
+	resultBool2: boolean = true
+
+	"Computed Question - string"
+	resultStr2: string = "computed string"
+
+	// Test for evaluating expressions
+	"Evaluate Question - Not"
+	resultNot: boolean = !resultBool2 // false
+
+	"Evaluate Question - And"
+	resultAnd: boolean = resultBool2 && resultNot // false
+
+	"Evaluate Question - Or"
+	resultOr: boolean = resultBool2 || resultNot // true
+
+	"Evaluate Question - Greater or equal"
+	resultGeq: boolean = resultInt2 >= 90 // true
+
+	"Evaluate Question - Less or equal"
+	resultLeq: boolean = resultInt2 <= 110 // true
+
+	"Evaluate Question - Equal Int"
+	resultEqu1: boolean = resultInt2 == 100 // true
+
+	"Evaluate Question - Equal String"
+	resultEqu2: boolean = resultStr2 == "computed string" // true
+
+	"Evaluate Question - Equal Boolean"
+	resultEqu3: boolean = resultBool2 == true // true
+
+	"Evaluate Question - Greater"
+	resultGr: boolean = resultInt2 > 1 // true
+
+	"Evaluate Question - Less"
+	resultLe: boolean = resultInt2 < 500 // true
+
+	"Evaluate Question - Arithmatic Expression"
+	resultArith: integer = 3 * (resultInt2 * 4) / 2 + 1 // 601
+	
+}

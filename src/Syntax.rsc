@@ -1,3 +1,4 @@
+/* Sangrok Lee (s3279480), Siheon Lee (s2898373)  */
 module Syntax
 
 extend lang::std::Layout;
@@ -40,7 +41,7 @@ syntax Expr
   > left ls: Expr lhs "\<" Expr rhs
   > left leq: Expr lhs "\<=" Expr rhs
   > left geq: Expr lhs "\>=" Expr rhs
-  > left eq: Expr lhs "==" Expr rhs
+  > left equ: Expr lhs "==" Expr rhs
   > left neq: Expr lhs "!=" Expr rhs
   > left and: Expr lhs "&&" Expr rhs
   > left or: Expr lhs "||" Expr rhs

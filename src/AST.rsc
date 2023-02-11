@@ -1,3 +1,4 @@
+/* Sangrok Lee (s3279480), Siheon Lee (s2898373)  */
 module AST
 
 import Syntax;
@@ -27,7 +28,6 @@ data AExpr(loc src = |tmp:///|)
   | st(str s)
   | number(int n)
   | bln(bool b)
-  | brck(AExpr exp)
   | not(AExpr exp)
   | add(AExpr lhs, AExpr rhs)
   | sub(AExpr lhs, AExpr rhs)
@@ -37,7 +37,7 @@ data AExpr(loc src = |tmp:///|)
   | ls(AExpr lhs, AExpr rhs)
   | leq(AExpr lhs, AExpr rhs)
   | geq(AExpr lhs, AExpr rhs)
-  | eq(AExpr lhs, AExpr rhs)
+  | equ(AExpr lhs, AExpr rhs)
   | neq(AExpr lhs, AExpr rhs)
   | and(AExpr lhs, AExpr rhs)
   | or(AExpr lhs, AExpr rhs)
